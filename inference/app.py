@@ -43,18 +43,12 @@ class COVIDXRay(Resource):
             required: true
             type: file
             description: An x-ray image
-          - name: label
-            in: formData
-            required: true
-            type: string
-            description: The real label for testing
       responses:
         201:
-          description: The image was processed
+          description: image processed and a prediction will be returned
       """
 
       self.parser.add_argument('covidxray', type=FileStorage, location='files', required=True)
-      self.parser.add_argument('label', type=str, required=True)
 
       args = self.parser.parse_args()
       uploadedImage = load_image(BytesIO(args['covidxray'].read())).reshape(256,256) # this may not work for all images
@@ -64,8 +58,7 @@ class COVIDXRay(Resource):
       i = pred_idx.item()
       classes = ['covid', 'nofinding', 'pneumonia']
       prediction = classes[i]
-      result = {'prediction':prediction,
-                'label':args['label']}
+      result = {'prediction':prediction}
 
       return result, 201
 
